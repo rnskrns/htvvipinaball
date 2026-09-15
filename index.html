@@ -13,25 +13,40 @@
     const value = document.querySelector('#in_names').value.trim();
     return value.split(/[,\r\n]/g).map((v)=>v.trim()).filter(Boolean);
 }
-function renderRankPreview(names) {
+function renderRankPreview(marbleList) {
     const listEl = document.querySelector('#rankList');
     const countEl = document.querySelector('#rankCount');
-    countEl.textContent = `${names.length} PLAYERS`;
+    countEl.textContent = `${marbleList.length} PLAYERS`;
     listEl.innerHTML = '';
-    names.forEach((name, i)=>{
-        const hue = (i * 47) % 360;
+    marbleList.forEach((marble, i)=>{
         const item = document.createElement('div');
         item.className = 'rank-item';
-        item.style.color = `hsl(${hue} 65% 32%)`;
+        item.style.color = `hsl(${marble.hue} 65% 32%)`;
         const rank = document.createElement('span');
         rank.className = 'rank-num';
         rank.textContent = `${i + 1}`;
         const nameEl = document.createElement('span');
         nameEl.className = 'rank-name';
-        nameEl.textContent = name;
+        nameEl.textContent = marble.name;
         item.append(rank, nameEl);
         listEl.append(item);
     });
+}
+function getLiveOrder() {
+    const r = window.roulette;
+    if (!r || !r._marbles) return [];
+    return [...(r._winners || []), ...r._marbles];
+}
+let rankLoopId = null;
+function startLiveRanking() {
+    stopLiveRanking();
+    rankLoopId = setInterval(()=>renderRankPreview(getLiveOrder()), 120);
+}
+function stopLiveRanking() {
+    if (rankLoopId) {
+        clearInterval(rankLoopId);
+        rankLoopId = null;
+    }
 }
 function getReady() {
     const names = getNames();
@@ -40,7 +55,7 @@ function getReady() {
     localStorage.setItem('htvvi_names', names.join(','));
     document.querySelector('#btnStart').disabled = !ready;
     document.querySelector('#playerCount').textContent = `${names.length}\u{BA85}`;
-    renderRankPreview(names);
+    renderRankPreview(getLiveOrder());
     applyWinnerSetting();
 }
 function applyWinnerSetting() {
@@ -82,17 +97,22 @@ function positionResultActions() {
     const btn = document.querySelector('#btnStart');
     const box = document.querySelector('#resultActions');
     if (!btn || !box) return;
-    // 화면 정중앙이 아니라 시작 버튼 바로 아래에 붙여서 배치한다
+    // 화면 정중앙이 아니라 시작 버튼 바로 아래에 붙이되, 화면 밖으로 나가지 않게 좌우를 clamp한다
     const rect = btn.getBoundingClientRect();
+    const margin = 12;
+    const boxWidth = box.offsetWidth || 160;
+    const minLeft = boxWidth / 2 + margin;
+    const maxLeft = window.innerWidth - boxWidth / 2 - margin;
+    const left = Math.min(Math.max(rect.left + rect.width / 2, minLeft), maxLeft);
     box.style.top = `${rect.bottom + 14}px`;
-    box.style.left = `${rect.left + rect.width / 2}px`;
+    box.style.left = `${left}px`;
 }
 function positionBigTimer() {
     const rect = getCanvasRect();
     const el = document.querySelector('#bigTimer');
     if (!rect || !el) return;
-    // 캔버스 정중앙(결과 텍스트 위치)이 아니라 그 아래쪽에 표시한다
-    const top = Math.min(rect.top + rect.height / 2 + 110, rect.bottom - 60);
+    // 결과 텍스트(당첨자 이름)와 겹치지 않도록 충분히 아래쪽으로 내려서 배치한다
+    const top = Math.min(rect.top + rect.height / 2 + 200, rect.bottom - 60);
     el.style.top = `${top}px`;
     el.style.left = `${rect.left + rect.width / 2}px`;
 }
@@ -156,14 +176,14 @@ function initialize() {
         document.querySelector('#settings').classList.add('hide');
         document.querySelector('#resultActions').classList.remove('show');
         stopTimer();
+        startLiveRanking();
         window.roulette.start();
     });
     document.querySelector('#btnReplay').addEventListener('click', ()=>{
         document.querySelector('#resultActions').classList.remove('show');
         stopTimer();
         getReady();
-        document.querySelector('#settings').classList.add('hide');
-        window.roulette.start();
+        document.querySelector('#settings').classList.remove('hide');
     });
     document.querySelector('#btnTimer').addEventListener('click', ()=>{
         if (timerInterval) stopTimer();
@@ -177,6 +197,8 @@ function initialize() {
     window.roulette.addEventListener('goal', ()=>{
         ready = false;
         stopTimer();
+        stopLiveRanking();
+        renderRankPreview(getLiveOrder());
         positionResultActions();
         document.querySelector('#resultActions').classList.add('show');
         setTimeout(()=>document.querySelector('#settings').classList.remove('hide'), 3000);
@@ -225,18 +247,20 @@ function initialize() {
           <label for="sltMap">맵</label>
           <select id="sltMap"></select>
         </div>
-        <div class="row">
-          <label>당첨</label>
-          <div class="winner-toggle-group">
-            <span class="toggle-side" id="winnerLabelFirst">1등</span>
-            <input type="checkbox" id="chkWinnerType" checked>
-            <span class="toggle-side on" id="winnerLabelLast">마지막</span>
-            <input type="number" id="in_winningRank" value="1" min="1" aria-label="직접 순위 입력">
+        <div class="row row-split">
+          <div class="split-col">
+            <label>당첨</label>
+            <div class="winner-toggle-group">
+              <span class="toggle-side" id="winnerLabelFirst">1등</span>
+              <input type="checkbox" id="chkWinnerType" checked>
+              <span class="toggle-side on" id="winnerLabelLast">마지막</span>
+              <input type="number" id="in_winningRank" value="1" min="1" aria-label="직접 순위 입력">
+            </div>
           </div>
-        </div>
-        <div class="row toggles">
-          <label for="chkSkill">스킬</label>
-          <input type="checkbox" id="chkSkill" checked="">
+          <div class="split-col skill-col">
+            <label for="chkSkill">스킬</label>
+            <input type="checkbox" id="chkSkill" checked="">
+          </div>
         </div>
         <div class="actions">
           <button id="btnShuffle" class="button ghost" aria-label="다시 섞기"><i class="icon shuffle"></i></button>
@@ -256,7 +280,7 @@ function initialize() {
 </section>
 
 <div id="resultActions" class="result-actions">
-  <button id="btnReplay" class="button primary" aria-label="다시하기"><i class="icon shuffle"></i><span>다시하기</span></button>
+  <button id="btnReplay" class="button ghost" aria-label="다시하기"><i class="icon refresh"></i></button>
   <button id="btnTimer" class="button ghost" aria-label="1분 타이머"><span id="timerLabel">타이머</span></button>
 </div>
 
