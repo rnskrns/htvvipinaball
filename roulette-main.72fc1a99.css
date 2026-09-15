@@ -49,14 +49,14 @@ canvas {
   z-index: 1;
   border: 1px solid var(--line);
   width: calc(100% - 354px);
-  height: calc(100% - 340px);
+  height: calc(100% - 88px);
   box-shadow: 0 16px 45px var(--shadow);
   touch-action: none;
   -webkit-user-select: none;
   user-select: none;
   border-radius: 28px;
   position: fixed;
-  inset: 68px 334px 272px 20px;
+  inset: 68px 334px 20px 20px;
 }
 
 .brand {
@@ -142,8 +142,9 @@ canvas {
   border: 1px solid var(--line);
   height: 100%;
   flex: 0 0 auto;
-  box-shadow: 0 16px 45px var(--shadow);
-  background: #fffeeff7;
+  box-shadow: 0 20px 50px #00000026;
+  backdrop-filter: blur(18px);
+  background: #fffeefc7;
   border-radius: 26px;
   display: flex;
   align-items: stretch;
@@ -434,7 +435,7 @@ textarea:focus, select:focus, input:focus {
   position: fixed;
   top: 68px;
   right: 20px;
-  bottom: 272px;
+  bottom: 20px;
 }
 
 .ranklist-header {
@@ -447,36 +448,36 @@ textarea:focus, select:focus, input:focus {
 }
 
 .ranklist-header span {
-  font-size: 13px;
+  font-size: 18px;
   font-weight: 800;
 }
 
 .ranklist-header strong {
   color: var(--muted);
   letter-spacing: .05em;
-  font-size: 10px;
+  font-size: 13px;
   font-weight: 800;
 }
 
 .ranklist-body {
   flex-direction: column;
-  gap: 5px;
+  gap: 8px;
   display: flex;
   overflow-y: auto;
 }
 
 .rank-item {
   align-items: center;
-  gap: 8px;
-  font-size: 12px;
+  gap: 10px;
+  font-size: 17px;
   font-weight: 700;
   display: flex;
 }
 
 .rank-num {
   color: var(--muted);
-  min-width: 16px;
-  font-size: 10px;
+  min-width: 24px;
+  font-size: 14px;
   font-weight: 800;
   text-align: right;
 }
@@ -517,8 +518,8 @@ textarea:focus, select:focus, input:focus {
 @media (width <= 900px) {
   canvas {
     width: calc(100% - 258px);
-    height: calc(100% - 304px);
-    inset: 60px 244px 244px 14px;
+    height: calc(100% - 74px);
+    inset: 60px 244px 14px 14px;
   }
 
   .brand {
@@ -557,7 +558,7 @@ textarea:focus, select:focus, input:focus {
     width: 220px;
     top: 60px;
     right: 14px;
-    bottom: 244px;
+    bottom: 14px;
   }
 }
 
@@ -572,9 +573,9 @@ textarea:focus, select:focus, input:focus {
 
   canvas {
     border-radius: 18px;
-    height: calc(100% - 170px);
+    height: calc(100% - 66px);
     top: 52px;
-    bottom: 118px;
+    bottom: 14px;
   }
 
   .left {

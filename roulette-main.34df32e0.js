@@ -955,6 +955,7 @@ class Roulette extends EventTarget {
         await this.physics.init();
         this.attachEvent();
         const minimap = new (0, _minimap.Minimap)();
+        this._minimap = minimap;
         minimap.onViewportChange((pos)=>{
             if (pos) {
                 this._camera.setPosition(pos, false);
@@ -1049,6 +1050,10 @@ class Roulette extends EventTarget {
     start() {
         this._isRunning = true;
         this._winnerRange = clipWinnerRange((0, _optionsDefault.default).winnerRange, this._marbles.length);
+        // 미니맵을 클릭해 시점을 고정해둔 상태로 시작하더라도, 게임이 시작되면
+        // 항상 카메라가 공을 따라가도록 잠금을 풀고 고정을 해제한다
+        if (this._minimap) this._minimap.pinned = false;
+        this._camera.lock(false);
         this._camera.startFollowingMarbles();
         if (this._autoRecording) this._recorder.start().then(()=>{
             this.physics.start();
