@@ -953,7 +953,6 @@ class Roulette extends EventTarget {
         this._recorder = new (0, _videoRecorder.VideoRecorder)(this._renderer.canvas);
         this.physics = new (0, _physicsBox2D.Box2dPhysics)();
         await this.physics.init();
-        this.addUiObject(new (0, _rankRenderer.RankRenderer)());
         this.attachEvent();
         const minimap = new (0, _minimap.Minimap)();
         minimap.onViewportChange((pos)=>{
@@ -10693,6 +10692,7 @@ class Minimap {
         this.lastParams = null;
         this._onViewportChangeHandler = null;
         this.mousePosition = null;
+        this.pinned = false;
         this.boundingBox = {
             x: MINIMAP_INSET,
             y: MINIMAP_INSET,
@@ -10710,6 +10710,8 @@ class Minimap {
     // nothing to do
     }
     onMouseMove(e) {
+        // 고정(핀)된 상태에서는 마우스가 움직이거나 미니맵을 벗어나도 시점을 유지한다
+        if (this.pinned) return;
         if (!e) {
             this.mousePosition = null;
             if (this._onViewportChangeHandler) this._onViewportChangeHandler();
@@ -10720,6 +10722,26 @@ class Minimap {
             x: e.x,
             y: e.y
         };
+        if (this._onViewportChangeHandler) this._onViewportChangeHandler({
+            x: this.mousePosition.x / 4,
+            y: this.mousePosition.y / 4
+        });
+    }
+    onMouseUp(e) {
+        // 미니맵 바깥에서 발생한 클릭(button 정보 없음)은 무시한다
+        if (!e || e.button !== 0) return;
+        if (this.pinned) {
+            // 이미 고정된 상태에서 다시 클릭하면 고정을 풀고 자동 추적으로 복귀한다
+            this.pinned = false;
+            if (this._onViewportChangeHandler) this._onViewportChangeHandler();
+            return;
+        }
+        if (!this.lastParams) return;
+        this.mousePosition = {
+            x: e.x,
+            y: e.y
+        };
+        this.pinned = true;
         if (this._onViewportChangeHandler) this._onViewportChangeHandler({
             x: this.mousePosition.x / 4,
             y: this.mousePosition.y / 4
