@@ -121,7 +121,7 @@ canvas {
 
 .settings {
   z-index: 5;
-  height: 290px;
+  height: 210px;
   display: flex;
   align-items: stretch;
   gap: 14px;
@@ -660,7 +660,7 @@ textarea:focus, select:focus, input:focus {
   }
 
   .settings {
-    height: 250px;
+    height: 170px;
     bottom: 12px;
     left: 14px;
   }
