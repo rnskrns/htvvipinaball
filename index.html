@@ -112,7 +112,7 @@ function positionBigTimer() {
     const el = document.querySelector('#bigTimer');
     if (!rect || !el) return;
     // 결과 텍스트(당첨자 이름)와 겹치지 않도록 충분히 아래쪽으로 내려서 배치한다
-    const top = Math.min(rect.top + rect.height / 2 + 200, rect.bottom - 60);
+    const top = Math.min(rect.top + rect.height / 2 + 260, rect.bottom - 60);
     el.style.top = `${top}px`;
     el.style.left = `${rect.left + rect.width / 2}px`;
 }
@@ -199,9 +199,11 @@ function initialize() {
         stopTimer();
         stopLiveRanking();
         renderRankPreview(getLiveOrder());
-        positionResultActions();
-        document.querySelector('#resultActions').classList.add('show');
-        setTimeout(()=>document.querySelector('#settings').classList.remove('hide'), 3000);
+        setTimeout(()=>{
+            document.querySelector('#settings').classList.remove('hide');
+            positionResultActions();
+            document.querySelector('#resultActions').classList.add('show');
+        }, 3000);
     });
     window.roulette.addEventListener('message', (e)=>{
         const toast = document.createElement('div');
