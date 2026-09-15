@@ -491,25 +491,26 @@ textarea:focus, select:focus, input:focus {
   z-index: 10;
   justify-content: center;
   align-items: center;
-  gap: 12px;
+  gap: 6px;
   opacity: 0;
   visibility: hidden;
   transition: opacity .3s, transform .3s, visibility .3s;
   display: flex;
   position: fixed;
   top: 50%;
-  left: 50%;
-  transform: translate(-50%, 10px);
+  left: 0;
+  transform: translateY(10px);
 }
 
 .result-actions.show {
   opacity: 1;
   visibility: visible;
-  transform: translate(-50%, 0);
+  transform: translateY(0);
 }
 
 .result-actions .button {
-  min-width: 120px;
+  min-width: 92px;
+  padding: 0 22px;
   box-shadow: 0 10px 24px var(--shadow);
 }
 
@@ -715,7 +716,7 @@ textarea:focus, select:focus, input:focus {
   }
 
   .result-actions .button {
-    min-width: 96px;
+    min-width: 92px;
   }
 }
 /*# sourceMappingURL=roulette-main.72fc1a99.css.map */

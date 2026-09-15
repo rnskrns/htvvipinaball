@@ -94,17 +94,18 @@ function getCanvasRect() {
     return canvas ? canvas.getBoundingClientRect() : null;
 }
 function positionResultActions() {
-    const btn = document.querySelector('#btnStart');
+    const actionsEl = document.querySelector('.actions');
     const box = document.querySelector('#resultActions');
-    if (!btn || !box) return;
-    // 화면 정중앙이 아니라 시작 버튼 바로 아래에 붙이되, 화면 밖으로 나가지 않게 좌우를 clamp한다
-    const rect = btn.getBoundingClientRect();
+    if (!actionsEl || !box) return;
+    // 섞기/시작 버튼 행(.actions) 바로 아래, 같은 좌측 기준선에 붙여서
+    // 다시하기=섞기, 중지=시작 버튼과 열(오와열)이 정확히 겹치도록 배치한다
+    const rect = actionsEl.getBoundingClientRect();
     const margin = 12;
-    const boxWidth = box.offsetWidth || 160;
-    const minLeft = boxWidth / 2 + margin;
-    const maxLeft = window.innerWidth - boxWidth / 2 - margin;
-    const left = Math.min(Math.max(rect.left + rect.width / 2, minLeft), maxLeft);
-    box.style.top = `${rect.bottom + 14}px`;
+    const boxWidth = box.offsetWidth || rect.width;
+    const minLeft = margin;
+    const maxLeft = window.innerWidth - boxWidth - margin;
+    const left = Math.min(Math.max(rect.left, minLeft), maxLeft);
+    box.style.top = `${rect.bottom + 10}px`;
     box.style.left = `${left}px`;
 }
 function positionBigTimer() {
