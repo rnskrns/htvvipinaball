@@ -13,7 +13,7 @@
     const value = document.querySelector('#in_names').value.trim();
     return value.split(/[,\r\n]/g).map((v)=>v.trim()).filter(Boolean);
 }
-function renderRankPreview({ list, finishedCount }) {
+function renderRankPreview({ list, finished }) {
     const listEl = document.querySelector('#rankList');
     const countEl = document.querySelector('#rankCount');
     countEl.textContent = `${list.length} PLAYERS`;
@@ -21,7 +21,7 @@ function renderRankPreview({ list, finishedCount }) {
     list.forEach((marble, i)=>{
         const item = document.createElement('div');
         item.className = 'rank-item';
-        if (i < finishedCount) item.classList.add('finished');
+        if (finished[i]) item.classList.add('finished');
         item.style.color = `hsl(${marble.hue} 65% 32%)`;
         const rank = document.createElement('span');
         rank.className = 'rank-num';
@@ -30,7 +30,7 @@ function renderRankPreview({ list, finishedCount }) {
         nameEl.className = 'rank-name';
         nameEl.textContent = marble.name;
         item.append(rank, nameEl);
-        if (i < finishedCount) {
+        if (finished[i]) {
             const check = document.createElement('span');
             check.className = 'rank-check';
             check.textContent = '\u2713';
@@ -43,15 +43,23 @@ function getLiveOrder() {
     const r = window.roulette;
     if (!r || !r._marbles) return {
         list: [],
-        finishedCount: 0
+        finished: []
     };
     const winners = r._winners || [];
+    let list = [
+        ...winners,
+        ...r._marbles
+    ];
+    let finished = list.map((_, i)=>i < winners.length);
+    // 당첨 조건이 '마지막'이면 꼴찌가 당첨자이므로, 순위를 뒤집어서
+    // 당첨에 가까운(꼴찌 쪽) 참가자가 위쪽에 보이게 한다
+    if (winnerType === 'last') {
+        list = list.slice().reverse();
+        finished = finished.slice().reverse();
+    }
     return {
-        list: [
-            ...winners,
-            ...r._marbles
-        ],
-        finishedCount: winners.length
+        list,
+        finished
     };
 }
 let rankLoopId = null;
@@ -184,11 +192,9 @@ function initialize() {
         stopTimer();
         stopLiveRanking();
         renderRankPreview(getLiveOrder());
-        setTimeout(()=>{
-            const winnerNames = e.detail?.winners?.length ? e.detail.winners.join(', ') : e.detail?.winner ?? '';
-            document.querySelector('#resultWinnerName').textContent = winnerNames;
-            document.querySelector('#resultOverlay').classList.add('show');
-        }, 3000);
+        const winnerNames = e.detail?.winners?.length ? e.detail.winners.join(', ') : e.detail?.winner ?? '';
+        document.querySelector('#resultWinnerName').textContent = winnerNames;
+        document.querySelector('#resultOverlay').classList.add('show');
     });
     window.roulette.addEventListener('message', (e)=>{
         const toast = document.createElement('div');
