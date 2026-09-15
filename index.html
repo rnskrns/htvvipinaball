@@ -89,19 +89,6 @@ function formatTime(totalSeconds) {
     const s = (totalSeconds % 60).toString().padStart(2, '0');
     return `${m}:${s}`;
 }
-function getCanvasRect() {
-    const canvas = document.querySelector('canvas');
-    return canvas ? canvas.getBoundingClientRect() : null;
-}
-function positionBigTimer() {
-    const rect = getCanvasRect();
-    const el = document.querySelector('#bigTimer');
-    if (!rect || !el) return;
-    // 결과 텍스트(당첨자 이름)와 겹치지 않도록 충분히 아래쪽으로 내려서 배치한다
-    const top = Math.min(rect.top + rect.height / 2 + 260, rect.bottom - 60);
-    el.style.top = `${top}px`;
-    el.style.left = `${rect.left + rect.width / 2}px`;
-}
 function stopTimer() {
     if (timerInterval) {
         clearInterval(timerInterval);
@@ -114,7 +101,6 @@ function stopTimer() {
 function startTimer() {
     stopTimer();
     let remaining = 60;
-    positionBigTimer();
     const bigValue = document.querySelector('#bigTimerValue');
     const bigTimer = document.querySelector('#bigTimer');
     bigValue.textContent = formatTime(remaining);
@@ -140,9 +126,6 @@ function startTimer() {
         bigValue.textContent = formatTime(remaining);
     }, 1000);
 }
-window.addEventListener('resize', ()=>{
-    if (document.querySelector('#bigTimer').classList.contains('show')) positionBigTimer();
-});
 document.addEventListener('DOMContentLoaded', initialize);
 function initialize() {
     if (!window.roulette || !window.roulette.isReady) {
@@ -270,16 +253,15 @@ function initialize() {
   <div id="resultPopup" class="result-popup">
     <span class="result-popup-label">오늘의 당첨자는</span>
     <strong id="resultWinnerName" class="result-popup-name">-</strong>
+    <div id="bigTimer" class="big-timer">
+      <div class="big-timer-label">TIMER</div>
+      <div class="big-timer-value" id="bigTimerValue">01:00</div>
+    </div>
     <div id="resultActions" class="result-actions">
-      <button id="btnReplay" class="button ghost" aria-label="다시하기"><i class="icon refresh"></i></button>
+      <button id="btnReplay" class="button ghost" aria-label="다시하기"><i class="icon refresh"></i><span>다시하기</span></button>
       <button id="btnTimer" class="button ghost" aria-label="1분 타이머"><span id="timerLabel">타이머</span></button>
     </div>
   </div>
-</div>
-
-<div id="bigTimer" class="big-timer">
-  <div class="big-timer-label">TIMER</div>
-  <div class="big-timer-value" id="bigTimerValue">01:00</div>
 </div>
 
 </body></html>
