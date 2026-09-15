@@ -11615,10 +11615,7 @@ class RouletteRenderer {
             this._resultPopupClosed = false;
         }
         this._resultCloseRect = null;
-        if (!result) return;
-        // 1명이면 기존 하단 Winner 표시, 여러명이면 화면 중앙 당첨자 목록 팝업
-        if (result.length === 1) this.renderWinner(result[0], params.theme);
-        else if (!this._resultPopupClosed) this.renderWinnerList(result, params);
+        // 캔버스 내부 결과 텍스트/팝업은 그리지 않는다 (HTML 결과 팝업으로 대체됨)
     }
     /** 결과 팝업 닫기 버튼을 눌렀는지 */ getResultCloseHitAt(x, y) {
         return inRect(this._resultCloseRect ?? undefined, x, y);
