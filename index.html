@@ -73,6 +73,40 @@ function selectWinnerType(type, edited) {
 }
 let ready = false;
 let winnerType = 'first';
+let timerInterval = null;
+function formatTime(totalSeconds) {
+    const m = Math.floor(totalSeconds / 60).toString().padStart(2, '0');
+    const s = (totalSeconds % 60).toString().padStart(2, '0');
+    return `${m}:${s}`;
+}
+function stopTimer() {
+    if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+    }
+    document.querySelector('#timerLabel').textContent = '타이머';
+    document.querySelector('#btnTimer').classList.remove('active-timer');
+}
+function startTimer() {
+    stopTimer();
+    let remaining = 60;
+    const label = document.querySelector('#timerLabel');
+    label.textContent = formatTime(remaining);
+    document.querySelector('#btnTimer').classList.add('active-timer');
+    timerInterval = setInterval(()=>{
+        remaining -= 1;
+        if (remaining <= 0) {
+            stopTimer();
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.textContent = '1분 타이머 종료';
+            document.body.appendChild(toast);
+            setTimeout(()=>toast.remove(), 1400);
+            return;
+        }
+        label.textContent = formatTime(remaining);
+    }, 1000);
+}
 document.addEventListener('DOMContentLoaded', initialize);
 function initialize() {
     if (!window.roulette || !window.roulette.isReady) {
@@ -89,8 +123,17 @@ function initialize() {
     document.querySelector('#btnStart').addEventListener('click', ()=>{
         if (!ready) return;
         document.querySelector('#settings').classList.add('hide');
+        document.querySelector('#resultActions').classList.remove('show');
         window.roulette.start();
     });
+    document.querySelector('#btnReplay').addEventListener('click', ()=>{
+        document.querySelector('#resultActions').classList.remove('show');
+        stopTimer();
+        getReady();
+        document.querySelector('#settings').classList.add('hide');
+        window.roulette.start();
+    });
+    document.querySelector('#btnTimer').addEventListener('click', startTimer);
     document.querySelector('#chkSkill').addEventListener('change', (e)=>{
         window.options.useSkills = e.target.checked;
     });
@@ -102,6 +145,7 @@ function initialize() {
     document.querySelector('#in_rangeEnd').addEventListener('change', ()=>selectWinnerType('multi', 'end'));
     window.roulette.addEventListener('goal', ()=>{
         ready = false;
+        document.querySelector('#resultActions').classList.add('show');
         setTimeout(()=>document.querySelector('#settings').classList.remove('hide'), 3000);
     });
     window.roulette.addEventListener('message', (e)=>{
@@ -186,5 +230,10 @@ function initialize() {
   </div>
   <div class="ranklist-body" id="rankList"></div>
 </section>
+
+<div id="resultActions" class="result-actions">
+  <button id="btnReplay" class="button primary" aria-label="다시하기"><i class="icon shuffle"></i><span>다시하기</span></button>
+  <button id="btnTimer" class="button ghost" aria-label="1분 타이머"><span id="timerLabel">타이머</span></button>
+</div>
 
 </body></html>
