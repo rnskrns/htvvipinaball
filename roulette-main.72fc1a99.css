@@ -124,7 +124,7 @@ canvas {
   height: 200px;
   display: flex;
   align-items: stretch;
-  gap: 12px;
+  gap: 14px;
   transition: opacity .35s, transform .35s, visibility .35s;
   position: fixed;
   bottom: 18px;
@@ -138,39 +138,53 @@ canvas {
   transform: translateY(14px);
 }
 
-.right {
+.combo-panel {
+  z-index: 4;
   border: 1px solid var(--line);
   height: 100%;
-  flex: 0 1 auto;
+  flex: 0 0 auto;
+  box-shadow: 0 16px 45px var(--shadow);
+  background: #fffeeff7;
+  border-radius: 26px;
+  display: flex;
+  align-items: stretch;
+  overflow: hidden;
+}
+
+.right {
+  height: 100%;
+  flex: 0 0 168px;
+  width: 168px;
   min-width: 0;
-  max-width: calc(50% - 12px);
-  margin-left: auto;
-  overflow-x: auto;
-  box-shadow: 0 13px 35px var(--shadow);
-  backdrop-filter: blur(16px);
-  background: #fffeeff5;
-  border-radius: 22px;
-  padding: 9px;
+  overflow-y: auto;
+  border-left: 1px solid var(--line);
+  background: none;
+  padding: 12px;
 }
 
 .collapsible-rows {
-  justify-content: center;
-  align-items: center;
-  gap: 8px;
-  height: 100%;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+  gap: 6px;
+  height: auto;
   display: flex;
 }
 
 .row, .dock-item {
   border: 0;
-  border-right: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
   background: none;
   flex-direction: column;
   justify-content: center;
   gap: 4px;
-  height: 50px;
-  padding: 0 16px;
+  height: auto;
+  padding: 6px 2px;
   display: flex;
+}
+
+.actions {
+  border-bottom: 0;
 }
 
 .row > label, .dock-label {
@@ -337,15 +351,9 @@ input[type="checkbox"]:checked:after {
 }
 
 .left {
-  z-index: 4;
-  order: -1;
-  border: 1px solid var(--line);
-  width: calc(50% - 6px);
-  flex: 0 0 calc(50% - 6px);
   height: 100%;
-  box-shadow: 0 16px 45px var(--shadow);
-  background: #fffeeff7;
-  border-radius: 26px;
+  flex: 0 0 260px;
+  width: 260px;
   padding: 18px;
 }
 
@@ -412,6 +420,72 @@ textarea:focus, select:focus, input:focus {
   mask-image: url("shuffle.ae708aec.svg");
 }
 
+.ranklist {
+  z-index: 4;
+  border: 1px solid var(--line);
+  height: 100%;
+  flex: 1;
+  min-width: 0;
+  box-shadow: 0 13px 35px var(--shadow);
+  backdrop-filter: blur(16px);
+  background: #fffeeff5;
+  border-radius: 22px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.ranklist-header {
+  justify-content: space-between;
+  align-items: baseline;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 8px;
+  padding-bottom: 8px;
+  display: flex;
+}
+
+.ranklist-header span {
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.ranklist-header strong {
+  color: var(--muted);
+  letter-spacing: .05em;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.ranklist-body {
+  flex-direction: column;
+  gap: 5px;
+  display: flex;
+  overflow-y: auto;
+}
+
+.rank-item {
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  display: flex;
+}
+
+.rank-num {
+  color: var(--muted);
+  min-width: 16px;
+  font-size: 10px;
+  font-weight: 800;
+  text-align: right;
+}
+
+.rank-name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .toast {
   z-index: 20;
   border: 1px solid var(--line);
@@ -460,11 +534,11 @@ textarea:focus, select:focus, input:focus {
   }
 
   .right {
-    overflow-x: auto;
+    flex: 0 0 140px;
+    width: 140px;
   }
 
   .collapsible-rows {
-    justify-content: flex-start;
     min-width: max-content;
   }
 
@@ -474,8 +548,8 @@ textarea:focus, select:focus, input:focus {
 
   .left {
     border-radius: 20px;
-    width: calc(50% - 6px);
-    flex: 0 0 calc(50% - 6px);
+    flex: 0 0 200px;
+    width: 200px;
     padding: 14px;
   }
 }
@@ -500,6 +574,10 @@ textarea:focus, select:focus, input:focus {
     display: none;
   }
 
+  .ranklist {
+    display: none;
+  }
+
   canvas {
     width: calc(100% - 28px);
     left: 14px;
@@ -510,12 +588,19 @@ textarea:focus, select:focus, input:focus {
   }
 
   .right {
+    flex: 1;
+    width: auto;
+    border-left: 0;
+  }
+
+  .combo-panel {
     border-radius: 18px;
+    flex: 1;
   }
 
   .row, .dock-item {
-    height: 44px;
-    padding: 0 9px;
+    height: auto;
+    padding: 5px 9px;
   }
 
   .button {

@@ -1999,7 +1999,7 @@ parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "stages", ()=>stages);
 const stages = [
     {
-        title: 'Wheel of fortune',
+        title: '행운의 수레바퀴',
         goalY: 111,
         zoomY: 106.75,
         adBoards: [
@@ -3009,7 +3009,7 @@ const stages = [
         ]
     },
     {
-        title: 'BubblePop',
+        title: '버블팝',
         goalY: 83,
         zoomY: 78,
         adBoards: [
@@ -4274,7 +4274,7 @@ const stages = [
         ]
     },
     {
-        title: 'Pot of greed',
+        title: '탐욕의 항아리',
         goalY: 91,
         zoomY: 92.5,
         adBoards: [
@@ -5085,7 +5085,7 @@ const stages = [
         ]
     },
     {
-        title: 'Yoru ni Kakeru',
+        title: '밤을 달리다',
         goalY: 248,
         zoomY: 234.5,
         adBoards: [

@@ -13,6 +13,26 @@
     const value = document.querySelector('#in_names').value.trim();
     return value.split(/[,\r\n]/g).map((v)=>v.trim()).filter(Boolean);
 }
+function renderRankPreview(names) {
+    const listEl = document.querySelector('#rankList');
+    const countEl = document.querySelector('#rankCount');
+    countEl.textContent = `${names.length} PLAYERS`;
+    listEl.innerHTML = '';
+    names.forEach((name, i)=>{
+        const hue = (i * 47) % 360;
+        const item = document.createElement('div');
+        item.className = 'rank-item';
+        item.style.color = `hsl(${hue} 65% 32%)`;
+        const rank = document.createElement('span');
+        rank.className = 'rank-num';
+        rank.textContent = `${i + 1}`;
+        const nameEl = document.createElement('span');
+        nameEl.className = 'rank-name';
+        nameEl.textContent = name;
+        item.append(rank, nameEl);
+        listEl.append(item);
+    });
+}
 function getReady() {
     const names = getNames();
     window.roulette.setMarbles(names);
@@ -20,6 +40,7 @@ function getReady() {
     localStorage.setItem('htvvi_names', names.join(','));
     document.querySelector('#btnStart').disabled = !ready;
     document.querySelector('#playerCount').textContent = `${names.length}\u{BA85}`;
+    renderRankPreview(names);
     applyWinnerSetting();
 }
 function applyWinnerSetting(edited) {
@@ -112,47 +133,57 @@ function initialize() {
 </header>
 
 <main id="settings" class="settings">
-  <section id="playersPanel" class="left">
-    <div class="section-title">
-      <span>PLAYER</span>
-      <small>쉼표 또는 줄바꿈으로 구분</small>
-      <strong id="playerCount">0명</strong>
-    </div>
-    <textarea id="in_names" aria-label="참가자 이름">1번 선수,2번 선수,3번 선수,4번 선수,5번 선수,6번 선수,7번 선수</textarea>
-  </section>
+  <div class="combo-panel">
+    <section id="playersPanel" class="left">
+      <div class="section-title">
+        <span>PLAYER</span>
+        <small>쉼표 또는 줄바꿈으로 구분</small>
+        <strong id="playerCount">0명</strong>
+      </div>
+      <textarea id="in_names" aria-label="참가자 이름">1번 선수,2번 선수,3번 선수,4번 선수,5번 선수,6번 선수,7번 선수</textarea>
+    </section>
 
-  <section class="right">
-    <div class="collapsible-rows">
-      <div class="row">
-        <label for="sltMap">맵</label>
-        <select id="sltMap"></select>
-      </div>
-      <div class="row">
-        <label>당첨</label>
-        <div class="btn-group">
-          <button class="btn-winner btn-first-winner active">1등</button>
-          <button class="btn-winner btn-last-winner">마지막</button>
-          <input type="number" id="in_winningRank" value="1" min="1" aria-label="직접 순위 입력">
-          <button class="btn-winner btn-multi-winner">여러 명</button>
+    <section class="right">
+      <div class="collapsible-rows">
+        <div class="row">
+          <label for="sltMap">맵</label>
+          <select id="sltMap"></select>
+        </div>
+        <div class="row">
+          <label>당첨</label>
+          <div class="btn-group">
+            <button class="btn-winner btn-first-winner active">1등</button>
+            <button class="btn-winner btn-last-winner">마지막</button>
+            <input type="number" id="in_winningRank" value="1" min="1" aria-label="직접 순위 입력">
+            <button class="btn-winner btn-multi-winner">여러 명</button>
+          </div>
+        </div>
+        <div class="row row-range">
+          <label>범위</label>
+          <div class="btn-group range-group">
+            <input type="number" id="in_rangeStart" value="1" min="1" aria-label="시작 순위">
+            <span>~</span>
+            <input type="number" id="in_rangeEnd" value="3" min="1" aria-label="마지막 순위">
+          </div>
+        </div>
+        <div class="row toggles">
+          <label for="chkSkill">스킬</label>
+          <input type="checkbox" id="chkSkill" checked="">
+        </div>
+        <div class="actions">
+          <button id="btnShuffle" class="button ghost" aria-label="다시 섞기"><i class="icon shuffle"></i></button>
+          <button id="btnStart" class="button primary"><i class="icon play"></i><span>시작</span></button>
         </div>
       </div>
-      <div class="row row-range">
-        <label>범위</label>
-        <div class="btn-group range-group">
-          <input type="number" id="in_rangeStart" value="1" min="1" aria-label="시작 순위">
-          <span>~</span>
-          <input type="number" id="in_rangeEnd" value="3" min="1" aria-label="마지막 순위">
-        </div>
-      </div>
-      <div class="row toggles">
-        <label for="chkSkill">스킬</label>
-        <input type="checkbox" id="chkSkill" checked="">
-      </div>
-      <div class="actions">
-        <button id="btnShuffle" class="button ghost" aria-label="다시 섞기"><i class="icon shuffle"></i></button>
-        <button id="btnStart" class="button primary"><i class="icon play"></i><span>시작</span></button>
-      </div>
+    </section>
+  </div>
+
+  <section id="rankPreview" class="ranklist">
+    <div class="ranklist-header">
+      <span>목록</span>
+      <strong id="rankCount">0 PLAYERS</strong>
     </div>
+    <div class="ranklist-body" id="rankList"></div>
   </section>
 </main>
 
