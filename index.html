@@ -79,6 +79,26 @@ function formatTime(totalSeconds) {
     const s = (totalSeconds % 60).toString().padStart(2, '0');
     return `${m}:${s}`;
 }
+function getCanvasRect() {
+    const canvas = document.querySelector('canvas');
+    return canvas ? canvas.getBoundingClientRect() : null;
+}
+function positionResultActions() {
+    const rect = getCanvasRect();
+    const box = document.querySelector('#resultActions');
+    if (!rect || !box) return;
+    // 결과 텍스트(중앙 부근)를 가리지 않도록 그 아래쪽으로 충분히 내려서 배치한다
+    const top = Math.min(rect.top + rect.height / 2 + 130, rect.bottom - 34);
+    box.style.top = `${top}px`;
+}
+function positionBigTimer() {
+    const rect = getCanvasRect();
+    const el = document.querySelector('#bigTimer');
+    if (!rect || !el) return;
+    // 결과 텍스트가 표시되던 캔버스 정중앙에 맞춘다
+    el.style.top = `${rect.top + rect.height / 2}px`;
+    el.style.left = `${rect.left + rect.width / 2}px`;
+}
 function stopTimer() {
     if (timerInterval) {
         clearInterval(timerInterval);
@@ -86,27 +106,41 @@ function stopTimer() {
     }
     document.querySelector('#timerLabel').textContent = '타이머';
     document.querySelector('#btnTimer').classList.remove('active-timer');
+    document.querySelector('#bigTimer').classList.remove('show');
 }
 function startTimer() {
     stopTimer();
     let remaining = 60;
-    const label = document.querySelector('#timerLabel');
-    label.textContent = formatTime(remaining);
+    positionBigTimer();
+    const bigValue = document.querySelector('#bigTimerValue');
+    const bigTimer = document.querySelector('#bigTimer');
+    bigValue.textContent = formatTime(remaining);
+    bigTimer.classList.add('show');
     document.querySelector('#btnTimer').classList.add('active-timer');
+    document.querySelector('#timerLabel').textContent = '중지';
     timerInterval = setInterval(()=>{
         remaining -= 1;
         if (remaining <= 0) {
-            stopTimer();
+            bigValue.textContent = '00:00';
+            clearInterval(timerInterval);
+            timerInterval = null;
+            document.querySelector('#btnTimer').classList.remove('active-timer');
+            document.querySelector('#timerLabel').textContent = '타이머';
             const toast = document.createElement('div');
             toast.className = 'toast';
             toast.textContent = '1분 타이머 종료';
             document.body.appendChild(toast);
             setTimeout(()=>toast.remove(), 1400);
+            setTimeout(()=>bigTimer.classList.remove('show'), 1200);
             return;
         }
-        label.textContent = formatTime(remaining);
+        bigValue.textContent = formatTime(remaining);
     }, 1000);
 }
+window.addEventListener('resize', ()=>{
+    if (document.querySelector('#resultActions').classList.contains('show')) positionResultActions();
+    if (document.querySelector('#bigTimer').classList.contains('show')) positionBigTimer();
+});
 document.addEventListener('DOMContentLoaded', initialize);
 function initialize() {
     if (!window.roulette || !window.roulette.isReady) {
@@ -124,6 +158,7 @@ function initialize() {
         if (!ready) return;
         document.querySelector('#settings').classList.add('hide');
         document.querySelector('#resultActions').classList.remove('show');
+        stopTimer();
         window.roulette.start();
     });
     document.querySelector('#btnReplay').addEventListener('click', ()=>{
@@ -133,7 +168,10 @@ function initialize() {
         document.querySelector('#settings').classList.add('hide');
         window.roulette.start();
     });
-    document.querySelector('#btnTimer').addEventListener('click', startTimer);
+    document.querySelector('#btnTimer').addEventListener('click', ()=>{
+        if (timerInterval) stopTimer();
+        else startTimer();
+    });
     document.querySelector('#chkSkill').addEventListener('change', (e)=>{
         window.options.useSkills = e.target.checked;
     });
@@ -145,6 +183,8 @@ function initialize() {
     document.querySelector('#in_rangeEnd').addEventListener('change', ()=>selectWinnerType('multi', 'end'));
     window.roulette.addEventListener('goal', ()=>{
         ready = false;
+        stopTimer();
+        positionResultActions();
         document.querySelector('#resultActions').classList.add('show');
         setTimeout(()=>document.querySelector('#settings').classList.remove('hide'), 3000);
     });
@@ -233,6 +273,11 @@ function initialize() {
 <div id="resultActions" class="result-actions">
   <button id="btnReplay" class="button primary" aria-label="다시하기"><i class="icon shuffle"></i><span>다시하기</span></button>
   <button id="btnTimer" class="button ghost" aria-label="1분 타이머"><span id="timerLabel">타이머</span></button>
+</div>
+
+<div id="bigTimer" class="big-timer">
+  <div class="big-timer-label">TIMER</div>
+  <div class="big-timer-value" id="bigTimerValue">01:00</div>
 </div>
 
 </body></html>

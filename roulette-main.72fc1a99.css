@@ -498,7 +498,7 @@ textarea:focus, select:focus, input:focus {
   transition: opacity .3s, transform .3s, visibility .3s;
   display: flex;
   position: fixed;
-  top: 56%;
+  top: 50%;
   left: 50%;
   transform: translate(-50%, 10px);
 }
@@ -522,6 +522,43 @@ textarea:focus, select:focus, input:focus {
 
 #timerLabel {
   font-variant-numeric: tabular-nums;
+}
+
+.big-timer {
+  z-index: 8;
+  pointer-events: none;
+  text-align: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity .3s, visibility .3s;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  white-space: nowrap;
+}
+
+.big-timer.show {
+  opacity: 1;
+  visibility: visible;
+}
+
+.big-timer-label {
+  color: var(--muted);
+  letter-spacing: .18em;
+  text-shadow: 0 2px 10px #fffdf9;
+  margin-bottom: 4px;
+  font-size: 20px;
+  font-weight: 800;
+}
+
+.big-timer-value {
+  color: #d9a800;
+  text-shadow: 0 10px 26px rgba(77, 55, 0, .28), 0 2px 0 #fffdf3;
+  font-variant-numeric: tabular-nums;
+  font-size: 128px;
+  font-weight: 800;
+  line-height: 1;
 }
 
 .toast {
@@ -596,6 +633,10 @@ textarea:focus, select:focus, input:focus {
     right: 14px;
     bottom: 14px;
   }
+
+  .big-timer-value {
+    font-size: 84px;
+  }
 }
 
 @media (width <= 560px) {
@@ -654,6 +695,18 @@ textarea:focus, select:focus, input:focus {
 
   .stage-frame {
     display: none;
+  }
+
+  .big-timer-value {
+    font-size: 56px;
+  }
+
+  .big-timer-label {
+    font-size: 14px;
+  }
+
+  .result-actions .button {
+    min-width: 96px;
   }
 }
 /*# sourceMappingURL=roulette-main.72fc1a99.css.map */
