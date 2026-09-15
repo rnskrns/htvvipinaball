@@ -226,24 +226,25 @@ select {
   text-overflow: ellipsis;
 }
 
-.btn-group {
-  gap: 3px;
+.winner-toggle-group {
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
   display: flex;
 }
 
-.btn-winner {
-  min-width: 42px;
-  height: 25px;
+.toggle-side {
   color: var(--muted);
-  background: #f4eee6;
-  border: 0;
-  border-radius: 8px;
-  padding: 0 8px;
   font-size: 10px;
   font-weight: 700;
+  transition: color .2s;
 }
 
-.btn-winner.active, #in_winningRank.active {
+.toggle-side.on {
+  color: var(--ink);
+}
+
+#in_winningRank.active {
   color: var(--ink);
   background: var(--yellow);
   box-shadow: 0 3px 8px #d8a80040;
@@ -256,23 +257,6 @@ select {
 
 #in_winningRank.active {
   display: block;
-}
-
-.row-range {
-  display: none;
-}
-
-.row-range.active {
-  display: flex;
-}
-
-.range-group input {
-  width: 44px;
-}
-
-.range-group span {
-  color: var(--muted);
-  line-height: 25px;
 }
 
 .toggles {
