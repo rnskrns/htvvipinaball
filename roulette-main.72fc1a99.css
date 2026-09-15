@@ -121,7 +121,7 @@ canvas {
 
 .settings {
   z-index: 5;
-  height: 210px;
+  height: 252px;
   display: flex;
   align-items: stretch;
   gap: 14px;
@@ -153,8 +153,8 @@ canvas {
 
 .right {
   height: 100%;
-  flex: 0 0 220px;
-  width: 220px;
+  flex: 0 0 264px;
+  width: 264px;
   min-width: 0;
   overflow-y: auto;
   border-left: 1px solid var(--line);
@@ -351,8 +351,8 @@ input[type="checkbox"]:checked:after {
 
 .left {
   height: 100%;
-  flex: 0 0 340px;
-  width: 340px;
+  flex: 0 0 408px;
+  width: 408px;
   padding: 20px;
 }
 
@@ -660,14 +660,14 @@ textarea:focus, select:focus, input:focus {
   }
 
   .settings {
-    height: 170px;
+    height: 204px;
     bottom: 12px;
     left: 14px;
   }
 
   .right {
-    flex: 0 0 140px;
-    width: 140px;
+    flex: 0 0 168px;
+    width: 168px;
   }
 
   .collapsible-rows {
@@ -680,8 +680,8 @@ textarea:focus, select:focus, input:focus {
 
   .left {
     border-radius: 20px;
-    flex: 0 0 200px;
-    width: 200px;
+    flex: 0 0 240px;
+    width: 240px;
     padding: 14px;
   }
 
@@ -724,7 +724,7 @@ textarea:focus, select:focus, input:focus {
   }
 
   .settings {
-    height: 96px;
+    height: 115px;
   }
 
   .right {

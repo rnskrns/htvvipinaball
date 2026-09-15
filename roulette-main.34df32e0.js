@@ -1949,9 +1949,9 @@ const Themes = {
                 bloomRadius: 0
             },
             polyline: {
-                fill: '#c9f1e6',
-                outline: '#397f6d',
-                bloom: '#e6faf5',
+                fill: '#cdeeff',
+                outline: '#2f7ab3',
+                bloom: '#eaf7ff',
                 bloomRadius: 0
             }
         },
