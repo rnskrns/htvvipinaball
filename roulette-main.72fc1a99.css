@@ -141,8 +141,11 @@ canvas {
 .right {
   border: 1px solid var(--line);
   height: 100%;
-  flex: 1;
+  flex: 0 1 auto;
   min-width: 0;
+  max-width: calc(50% - 12px);
+  margin-left: auto;
+  overflow-x: auto;
   box-shadow: 0 13px 35px var(--shadow);
   backdrop-filter: blur(16px);
   background: #fffeeff5;
@@ -177,7 +180,7 @@ canvas {
   font-weight: 800;
 }
 
-select, input[type="number"] {
+input[type="number"] {
   background: var(--yellow-soft);
   min-width: 0;
   height: 25px;
@@ -191,7 +194,22 @@ select, input[type="number"] {
 }
 
 select {
-  width: 120px;
+  background: none;
+  min-width: 0;
+  width: auto;
+  max-width: 140px;
+  height: 25px;
+  color: var(--ink);
+  border: 0;
+  border-radius: 8px;
+  outline: none;
+  padding: 0 4px;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .btn-group {
@@ -322,8 +340,8 @@ input[type="checkbox"]:checked:after {
   z-index: 4;
   order: -1;
   border: 1px solid var(--line);
-  width: 250px;
-  flex: 0 0 250px;
+  width: calc(50% - 6px);
+  flex: 0 0 calc(50% - 6px);
   height: 100%;
   box-shadow: 0 16px 45px var(--shadow);
   background: #fffeeff7;
@@ -456,8 +474,8 @@ textarea:focus, select:focus, input:focus {
 
   .left {
     border-radius: 20px;
-    width: 196px;
-    flex: 0 0 196px;
+    width: calc(50% - 6px);
+    flex: 0 0 calc(50% - 6px);
     padding: 14px;
   }
 }

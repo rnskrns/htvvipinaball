@@ -10745,13 +10745,6 @@ class Minimap {
         this.drawMarbles(params);
         this.drawViewport(params);
         ctx.restore();
-        ctx.save();
-        ctx.strokeStyle = 'rgba(211, 169, 45, .75)';
-        ctx.lineWidth = 1.5;
-        ctx.beginPath();
-        ctx.roundRect(this.boundingBox.x, this.boundingBox.y, this.boundingBox.w, this.boundingBox.h, 18);
-        ctx.stroke();
-        ctx.restore();
     }
     drawViewport(params) {
         this.ctx.save();
