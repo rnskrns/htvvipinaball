@@ -13,14 +13,15 @@
     const value = document.querySelector('#in_names').value.trim();
     return value.split(/[,\r\n]/g).map((v)=>v.trim()).filter(Boolean);
 }
-function renderRankPreview(marbleList) {
+function renderRankPreview({ list, finishedCount }) {
     const listEl = document.querySelector('#rankList');
     const countEl = document.querySelector('#rankCount');
-    countEl.textContent = `${marbleList.length} PLAYERS`;
+    countEl.textContent = `${list.length} PLAYERS`;
     listEl.innerHTML = '';
-    marbleList.forEach((marble, i)=>{
+    list.forEach((marble, i)=>{
         const item = document.createElement('div');
         item.className = 'rank-item';
+        if (i < finishedCount) item.classList.add('finished');
         item.style.color = `hsl(${marble.hue} 65% 32%)`;
         const rank = document.createElement('span');
         rank.className = 'rank-num';
@@ -29,13 +30,29 @@ function renderRankPreview(marbleList) {
         nameEl.className = 'rank-name';
         nameEl.textContent = marble.name;
         item.append(rank, nameEl);
+        if (i < finishedCount) {
+            const check = document.createElement('span');
+            check.className = 'rank-check';
+            check.textContent = '\u2713';
+            item.append(check);
+        }
         listEl.append(item);
     });
 }
 function getLiveOrder() {
     const r = window.roulette;
-    if (!r || !r._marbles) return [];
-    return [...(r._winners || []), ...r._marbles];
+    if (!r || !r._marbles) return {
+        list: [],
+        finishedCount: 0
+    };
+    const winners = r._winners || [];
+    return {
+        list: [
+            ...winners,
+            ...r._marbles
+        ],
+        finishedCount: winners.length
+    };
 }
 let rankLoopId = null;
 function startLiveRanking() {

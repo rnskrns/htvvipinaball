@@ -487,6 +487,18 @@ textarea:focus, select:focus, input:focus {
   text-overflow: ellipsis;
 }
 
+.rank-check {
+  color: #3fa34d;
+  margin-left: auto;
+  padding-left: 8px;
+  font-size: 15px;
+  font-weight: 900;
+}
+
+.rank-item.finished .rank-name {
+  opacity: .8;
+}
+
 .result-overlay {
   z-index: 10;
   flex-direction: column;
@@ -552,7 +564,10 @@ textarea:focus, select:focus, input:focus {
 }
 
 #btnReplay.button {
+  width: auto;
+  min-width: 92px;
   padding: 0 20px;
+  white-space: nowrap;
 }
 
 .icon.refresh {
@@ -595,8 +610,9 @@ textarea:focus, select:focus, input:focus {
 }
 
 .big-timer-value {
-  color: #d9a800;
-  text-shadow: 0 6px 16px rgba(77, 55, 0, .22);
+  color: #ffd873;
+  text-shadow: 0 1px 0 #b8860020, 0 4px 14px rgba(184, 134, 0, .18);
+  -webkit-text-stroke: 1px #e8b23a55;
   font-variant-numeric: tabular-nums;
   font-size: 64px;
   font-weight: 800;
