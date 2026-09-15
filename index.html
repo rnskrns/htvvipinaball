@@ -93,21 +93,6 @@ function getCanvasRect() {
     const canvas = document.querySelector('canvas');
     return canvas ? canvas.getBoundingClientRect() : null;
 }
-function positionResultActions() {
-    const actionsEl = document.querySelector('.actions');
-    const box = document.querySelector('#resultActions');
-    if (!actionsEl || !box) return;
-    // 섞기/시작 버튼 행(.actions) 바로 아래, 같은 좌측 기준선에 붙여서
-    // 다시하기=섞기, 중지=시작 버튼과 열(오와열)이 정확히 겹치도록 배치한다
-    const rect = actionsEl.getBoundingClientRect();
-    const margin = 12;
-    const boxWidth = box.offsetWidth || rect.width;
-    const minLeft = margin;
-    const maxLeft = window.innerWidth - boxWidth - margin;
-    const left = Math.min(Math.max(rect.left, minLeft), maxLeft);
-    box.style.top = `${rect.bottom + 10}px`;
-    box.style.left = `${left}px`;
-}
 function positionBigTimer() {
     const rect = getCanvasRect();
     const el = document.querySelector('#bigTimer');
@@ -156,7 +141,6 @@ function startTimer() {
     }, 1000);
 }
 window.addEventListener('resize', ()=>{
-    if (document.querySelector('#resultActions').classList.contains('show')) positionResultActions();
     if (document.querySelector('#bigTimer').classList.contains('show')) positionBigTimer();
 });
 document.addEventListener('DOMContentLoaded', initialize);
@@ -175,13 +159,13 @@ function initialize() {
     document.querySelector('#btnStart').addEventListener('click', ()=>{
         if (!ready) return;
         document.querySelector('#settings').classList.add('hide');
-        document.querySelector('#resultActions').classList.remove('show');
+        document.querySelector('#resultOverlay').classList.remove('show');
         stopTimer();
         startLiveRanking();
         window.roulette.start();
     });
     document.querySelector('#btnReplay').addEventListener('click', ()=>{
-        document.querySelector('#resultActions').classList.remove('show');
+        document.querySelector('#resultOverlay').classList.remove('show');
         stopTimer();
         getReady();
         document.querySelector('#settings').classList.remove('hide');
@@ -195,15 +179,15 @@ function initialize() {
     });
     document.querySelector('#in_winningRank').addEventListener('change', ()=>selectWinnerType('custom'));
     document.querySelector('#chkWinnerType').addEventListener('change', (e)=>selectWinnerType(e.target.checked ? 'last' : 'first'));
-    window.roulette.addEventListener('goal', ()=>{
+    window.roulette.addEventListener('goal', (e)=>{
         ready = false;
         stopTimer();
         stopLiveRanking();
         renderRankPreview(getLiveOrder());
         setTimeout(()=>{
-            document.querySelector('#settings').classList.remove('hide');
-            positionResultActions();
-            document.querySelector('#resultActions').classList.add('show');
+            const winnerNames = e.detail?.winners?.length ? e.detail.winners.join(', ') : e.detail?.winner ?? '';
+            document.querySelector('#resultWinnerName').textContent = winnerNames;
+            document.querySelector('#resultOverlay').classList.add('show');
         }, 3000);
     });
     window.roulette.addEventListener('message', (e)=>{
@@ -282,9 +266,15 @@ function initialize() {
   <div class="ranklist-body" id="rankList"></div>
 </section>
 
-<div id="resultActions" class="result-actions">
-  <button id="btnReplay" class="button ghost" aria-label="다시하기"><i class="icon refresh"></i></button>
-  <button id="btnTimer" class="button ghost" aria-label="1분 타이머"><span id="timerLabel">타이머</span></button>
+<div id="resultOverlay" class="result-overlay">
+  <div id="resultPopup" class="result-popup">
+    <span class="result-popup-label">오늘의 당첨자는</span>
+    <strong id="resultWinnerName" class="result-popup-name">-</strong>
+  </div>
+  <div id="resultActions" class="result-actions">
+    <button id="btnReplay" class="button ghost" aria-label="다시하기"><i class="icon refresh"></i></button>
+    <button id="btnTimer" class="button ghost" aria-label="1분 타이머"><span id="timerLabel">타이머</span></button>
+  </div>
 </div>
 
 <div id="bigTimer" class="big-timer">
