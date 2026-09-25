@@ -39,6 +39,7 @@ function renderRankPreview({ list, finished }) {
         listEl.append(item);
     });
 }
+let lastRankSignature = '';
 function getLiveOrder() {
     const r = window.roulette;
     if (!r || !r._marbles) return {
@@ -51,25 +52,33 @@ function getLiveOrder() {
         ...r._marbles
     ];
     let finished = list.map((_, i)=>i < winners.length);
-    // 당첨 조건이 '마지막'이면 꼴찌가 당첨자이므로, 순위를 뒤집어서
-    // 당첨에 가까운(꼴찌 쪽) 참가자가 위쪽에 보이게 한다
-    if (winnerType === 'last') {
-        list = list.slice().reverse();
-        finished = finished.slice().reverse();
-    }
     return {
         list,
         finished
     };
 }
 let rankLoopId = null;
+let lastRankPaint = 0;
 function startLiveRanking() {
     stopLiveRanking();
-    rankLoopId = setInterval(()=>renderRankPreview(getLiveOrder()), 120);
+    const paint = (now)=>{
+        if (!rankLoopId) return;
+        if (now - lastRankPaint >= 200) {
+            const order = getLiveOrder();
+            const signature = order.list.map((marble, i)=>`${marble.id}:${i < order.finished.length && order.finished[i] ? 1 : 0}`).join('|');
+            if (signature !== lastRankSignature) {
+                lastRankSignature = signature;
+                renderRankPreview(order);
+            }
+            lastRankPaint = now;
+        }
+        rankLoopId = requestAnimationFrame(paint);
+    };
+    rankLoopId = requestAnimationFrame(paint);
 }
 function stopLiveRanking() {
     if (rankLoopId) {
-        clearInterval(rankLoopId);
+        cancelAnimationFrame(rankLoopId);
         rankLoopId = null;
     }
 }
@@ -85,30 +94,64 @@ function getReady() {
 }
 function applyWinnerSetting() {
     const rankInput = document.querySelector('#in_winningRank');
-    const chk = document.querySelector('#chkWinnerType');
-    let start;
-    let end;
-    if (winnerType === 'first') {
-        start = end = 1;
-        chk.checked = false;
-    } else if (winnerType === 'last') {
-        start = end = window.roulette.getCount();
-        chk.checked = true;
-    } else start = end = parseInt(rankInput.value, 10) || 1;
-    window.roulette.setWinnerRange(start - 1, end - 1);
+    const count = Math.max(1, window.roulette.getCount());
+    const end = Math.min(count, Math.max(1, parseInt(rankInput.value, 10) || 1));
+    window.roulette.setWinnerRange(0, end - 1);
     const clipped = window.roulette.getWinnerRange();
-    rankInput.value = clipped.start + 1;
-    rankInput.classList.toggle('active', winnerType === 'custom');
-    document.querySelector('#winnerLabelFirst').classList.toggle('on', winnerType === 'first');
-    document.querySelector('#winnerLabelLast').classList.toggle('on', winnerType === 'last');
-}
-function selectWinnerType(type) {
-    winnerType = type;
-    applyWinnerSetting();
+    rankInput.value = clipped.end + 1;
+    rankInput.max = count;
 }
 let ready = false;
-let winnerType = 'last';
 let timerInterval = null;
+function showCopyToast(message) {
+    const toast = document.createElement('div');
+    toast.className = 'toast';
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    setTimeout(()=>toast.remove(), 1400);
+}
+async function copyWinnerId(id, button) {
+    try {
+        await navigator.clipboard.writeText(id);
+    } catch (_) {
+        const input = document.createElement('textarea');
+        input.value = id;
+        input.style.position = 'fixed';
+        input.style.opacity = '0';
+        document.body.appendChild(input);
+        input.select();
+        document.execCommand('copy');
+        input.remove();
+    }
+    button.classList.add('copied');
+    button.setAttribute('aria-label', `${id} 복사 완료`);
+    setTimeout(()=>{
+        button.classList.remove('copied');
+        button.setAttribute('aria-label', `${id} 복사`);
+    }, 1000);
+    showCopyToast(`${id} 복사 완료`);
+}
+function renderWinnerResults(winners) {
+    const list = document.querySelector('#resultWinnerList');
+    list.replaceChildren();
+    winners.slice(0, 7).forEach((id, index)=>{
+        const row = document.createElement('div');
+        row.className = 'result-winner-row';
+        const rank = document.createElement('span');
+        rank.className = 'result-winner-rank';
+        rank.textContent = `${index + 1}등`;
+        const name = document.createElement('strong');
+        name.className = 'result-winner-id';
+        name.textContent = id;
+        const copy = document.createElement('button');
+        copy.type = 'button';
+        copy.className = 'copy-id-button';
+        copy.setAttribute('aria-label', `${index + 1}등 ${id} 복사`);
+        copy.addEventListener('click', ()=>copyWinnerId(id, copy));
+        row.append(rank, name, copy);
+        list.append(row);
+    });
+}
 function formatTime(totalSeconds) {
     const m = Math.floor(totalSeconds / 60).toString().padStart(2, '0');
     const s = (totalSeconds % 60).toString().padStart(2, '0');
@@ -185,15 +228,14 @@ function initialize() {
     document.querySelector('#chkSkill').addEventListener('change', (e)=>{
         window.options.useSkills = e.target.checked;
     });
-    document.querySelector('#in_winningRank').addEventListener('change', ()=>selectWinnerType('custom'));
-    document.querySelector('#chkWinnerType').addEventListener('change', (e)=>selectWinnerType(e.target.checked ? 'last' : 'first'));
+    document.querySelector('#in_winningRank').addEventListener('input', applyWinnerSetting);
     window.roulette.addEventListener('goal', (e)=>{
         ready = false;
         stopTimer();
         stopLiveRanking();
         renderRankPreview(getLiveOrder());
-        const winnerNames = e.detail?.winners?.length ? e.detail.winners.join(', ') : e.detail?.winner ?? '';
-        document.querySelector('#resultWinnerName').textContent = winnerNames;
+        const winners = e.detail?.winners?.length ? e.detail.winners : [e.detail?.winner ?? ''].filter(Boolean);
+        renderWinnerResults(winners);
         document.querySelector('#resultOverlay').classList.add('show');
     });
     window.roulette.addEventListener('message', (e)=>{
@@ -240,20 +282,16 @@ function initialize() {
           <label for="sltMap">맵</label>
           <select id="sltMap"></select>
         </div>
-        <div class="row row-split">
-          <div class="split-col">
-            <label>당첨</label>
-            <div class="winner-toggle-group">
-              <span class="toggle-side" id="winnerLabelFirst">1등</span>
-              <input type="checkbox" id="chkWinnerType" checked>
-              <span class="toggle-side on" id="winnerLabelLast">마지막</span>
-              <input type="number" id="in_winningRank" value="1" min="1" aria-label="직접 순위 입력">
-            </div>
+        <div class="row winner-row">
+          <label for="in_winningRank">당첨</label>
+          <div class="winner-rank-control">
+            <input type="number" id="in_winningRank" value="1" min="1" inputmode="numeric" aria-label="몇 등까지 당첨할지 입력">
+            <span>등까지</span>
           </div>
-          <div class="split-col skill-col">
-            <label for="chkSkill">스킬</label>
-            <input type="checkbox" id="chkSkill" checked="">
-          </div>
+        </div>
+        <div class="row skill-row">
+          <label for="chkSkill">스킬</label>
+          <input type="checkbox" id="chkSkill" checked="">
         </div>
         <div class="actions">
           <button id="btnShuffle" class="button ghost" aria-label="다시 섞기"><i class="icon shuffle"></i></button>
@@ -275,7 +313,7 @@ function initialize() {
 <div id="resultOverlay" class="result-overlay">
   <div id="resultPopup" class="result-popup">
     <span class="result-popup-label">오늘의 당첨자는</span>
-    <strong id="resultWinnerName" class="result-popup-name">-</strong>
+    <div id="resultWinnerList" class="result-winner-list" aria-live="polite"></div>
     <div id="bigTimer" class="big-timer">
       <div class="big-timer-label">TIMER</div>
       <div class="big-timer-value" id="bigTimerValue">01:00</div>

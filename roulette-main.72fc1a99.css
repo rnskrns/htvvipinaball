@@ -252,6 +252,21 @@ select {
   display: flex;
 }
 
+.winner-row, .skill-row {
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.winner-rank-control {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--ink);
+  font-size: 11px;
+  font-weight: 800;
+}
+
 .toggle-side {
   color: var(--muted);
   font-size: 10px;
@@ -270,8 +285,8 @@ select {
 }
 
 #in_winningRank {
-  width: 42px;
-  display: none;
+  width: 56px;
+  display: block;
 }
 
 #in_winningRank.active {
@@ -549,6 +564,72 @@ textarea:focus, select:focus, input:focus {
   word-break: keep-all;
 }
 
+.result-winner-list {
+  width: min(440px, calc(100vw - 96px));
+  max-height: 360px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.result-winner-row {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 10px 9px 14px;
+  background: var(--yellow-soft);
+  border-radius: 14px;
+}
+
+.result-winner-rank {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.result-winner-id {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--ink);
+  font-size: 18px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.copy-id-button {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  color: var(--ink);
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.copy-id-button:before {
+  content: "";
+  width: 15px;
+  height: 15px;
+  background: currentColor;
+  mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M16 1H4a2 2 0 0 0-2 2v14h2V3h12V1zm3 4H8a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 16H8V7h11v14z'/></svg>") center / contain no-repeat;
+}
+
+.copy-id-button.copied:before {
+  mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z'/></svg>");
+}
+
+.copy-id-button:hover {
+  background: var(--yellow);
+}
+
 .result-actions {
   justify-content: center;
   align-items: center;
@@ -660,18 +741,20 @@ textarea:focus, select:focus, input:focus {
   }
 
   .settings {
-    height: 204px;
+    height: 220px;
     bottom: 12px;
     left: 14px;
   }
 
   .right {
-    flex: 0 0 168px;
-    width: 168px;
+    flex: 0 0 185px;
+    width: 185px;
+    padding: 12px;
+    overflow-x: hidden;
   }
 
   .collapsible-rows {
-    min-width: max-content;
+    min-width: 0;
   }
 
   .stage-frame {
@@ -680,8 +763,8 @@ textarea:focus, select:focus, input:focus {
 
   .left {
     border-radius: 20px;
-    flex: 0 0 240px;
-    width: 240px;
+    flex: 0 0 220px;
+    width: 220px;
     padding: 14px;
   }
 
@@ -763,6 +846,10 @@ textarea:focus, select:focus, input:focus {
 
   .result-popup-name {
     font-size: 32px;
+  }
+
+  .result-winner-list {
+    width: 100%;
   }
 
   .result-actions .button {
