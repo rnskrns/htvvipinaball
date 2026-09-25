@@ -52,6 +52,10 @@ function getLiveOrder() {
         ...r._marbles
     ];
     let finished = list.map((_, i)=>i < winners.length);
+    if (winnerType === 'last') {
+        list = list.slice().reverse();
+        finished = finished.slice().reverse();
+    }
     return {
         list,
         finished
@@ -95,13 +99,19 @@ function getReady() {
 function applyWinnerSetting() {
     const rankInput = document.querySelector('#in_winningRank');
     const count = Math.max(1, window.roulette.getCount());
-    const end = Math.min(count, Math.max(1, parseInt(rankInput.value, 10) || 1));
-    window.roulette.setWinnerRange(0, end - 1);
+    const winnerCount = Math.min(count, Math.max(1, parseInt(rankInput.value, 10) || 1));
+    const start = winnerType === 'last' ? count - winnerCount : 0;
+    const end = winnerType === 'last' ? count - 1 : winnerCount - 1;
+    window.roulette.setWinnerRange(start, end);
     const clipped = window.roulette.getWinnerRange();
-    rankInput.value = clipped.end + 1;
+    rankInput.value = clipped.end - clipped.start + 1;
     rankInput.max = count;
+    document.querySelector('#winnerLabelFirst').classList.toggle('on', winnerType === 'first');
+    document.querySelector('#winnerLabelLast').classList.toggle('on', winnerType === 'last');
+    document.querySelector('#chkWinnerType').checked = winnerType === 'last';
 }
 let ready = false;
+let winnerType = 'last';
 let timerInterval = null;
 function showCopyToast(message) {
     const toast = document.createElement('div');
@@ -131,7 +141,7 @@ async function copyWinnerId(id, button) {
     }, 1000);
     showCopyToast(`${id} 복사 완료`);
 }
-function renderWinnerResults(winners) {
+function renderWinnerResults(winners, startRank = 0) {
     const list = document.querySelector('#resultWinnerList');
     list.replaceChildren();
     winners.slice(0, 7).forEach((id, index)=>{
@@ -139,7 +149,7 @@ function renderWinnerResults(winners) {
         row.className = 'result-winner-row';
         const rank = document.createElement('span');
         rank.className = 'result-winner-rank';
-        rank.textContent = `${index + 1}등`;
+        rank.textContent = `${startRank + index + 1}등`;
         const name = document.createElement('strong');
         name.className = 'result-winner-id';
         name.textContent = id;
@@ -229,13 +239,18 @@ function initialize() {
         window.options.useSkills = e.target.checked;
     });
     document.querySelector('#in_winningRank').addEventListener('input', applyWinnerSetting);
+    document.querySelector('#chkWinnerType').addEventListener('change', (event)=>{
+        winnerType = event.target.checked ? 'last' : 'first';
+        applyWinnerSetting();
+        renderRankPreview(getLiveOrder());
+    });
     window.roulette.addEventListener('goal', (e)=>{
         ready = false;
         stopTimer();
         stopLiveRanking();
         renderRankPreview(getLiveOrder());
         const winners = e.detail?.winners?.length ? e.detail.winners : [e.detail?.winner ?? ''].filter(Boolean);
-        renderWinnerResults(winners);
+        renderWinnerResults(winners, window.roulette.getWinnerRange().start);
         document.querySelector('#resultOverlay').classList.add('show');
     });
     window.roulette.addEventListener('message', (e)=>{
@@ -283,10 +298,15 @@ function initialize() {
           <select id="sltMap"></select>
         </div>
         <div class="row winner-row">
-          <label for="in_winningRank">당첨</label>
+          <label>당첨</label>
+          <div class="winner-toggle-group">
+            <span class="toggle-side" id="winnerLabelFirst">1등</span>
+            <input type="checkbox" id="chkWinnerType" checked aria-label="1등 또는 마지막 기준 선택">
+            <span class="toggle-side on" id="winnerLabelLast">마지막</span>
+          </div>
           <div class="winner-rank-control">
-            <input type="number" id="in_winningRank" value="1" min="1" inputmode="numeric" aria-label="몇 등까지 당첨할지 입력">
-            <span>등까지</span>
+            <input type="number" id="in_winningRank" value="1" min="1" inputmode="numeric" aria-label="당첨 인원 입력">
+            <span>명</span>
           </div>
         </div>
         <div class="row skill-row">

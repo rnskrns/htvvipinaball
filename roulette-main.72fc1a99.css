@@ -258,6 +258,11 @@ select {
   justify-content: space-between;
 }
 
+.winner-row {
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
 .winner-rank-control {
   display: flex;
   align-items: center;
@@ -285,7 +290,7 @@ select {
 }
 
 #in_winningRank {
-  width: 56px;
+  width: 44px;
   display: block;
 }
 
