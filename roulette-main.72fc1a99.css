@@ -478,6 +478,20 @@ textarea:focus, select:focus, input:focus {
   font-weight: 800;
 }
 
+.ranklist-stats {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ranklist-stats em {
+  color: var(--yellow-strong);
+  font-size: 10px;
+  font-style: normal;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
 .ranklist-body {
   flex-direction: column;
   gap: 8px;

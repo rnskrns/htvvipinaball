@@ -11546,7 +11546,6 @@ class RouletteRenderer {
         this.onAfterScene();
         uiObjects.forEach((obj)=>obj.render(this.ctx, renderParameters, this._sceneCanvas.width, this._sceneCanvas.height));
         renderParameters.particleManager.render(this.ctx);
-        this.renderWinnerProgress(renderParameters);
         this.renderResult(renderParameters);
         this._displayCtx.drawImage(this._sceneCanvas, 0, 0, this._canvas.width, this._canvas.height);
         this.renderAdOverlay(renderParameters);

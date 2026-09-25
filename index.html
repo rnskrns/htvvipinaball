@@ -13,10 +13,12 @@
     const value = document.querySelector('#in_names').value.trim();
     return value.split(/[,\r\n]/g).map((v)=>v.trim()).filter(Boolean);
 }
-function renderRankPreview({ list, finished }) {
+function renderRankPreview({ list, finished, winnerProgress = 0, winnerTarget = 1 }) {
     const listEl = document.querySelector('#rankList');
     const countEl = document.querySelector('#rankCount');
+    const progressEl = document.querySelector('#winnerProgress');
     countEl.textContent = `${list.length} PLAYERS`;
+    progressEl.textContent = `당첨 ${winnerProgress} / ${winnerTarget}`;
     listEl.innerHTML = '';
     list.forEach((marble, i)=>{
         const item = document.createElement('div');
@@ -47,6 +49,9 @@ function getLiveOrder() {
         finished: []
     };
     const winners = r._winners || [];
+    const range = r.getWinnerRange();
+    const winnerTarget = range.end - range.start + 1;
+    const winnerProgress = Math.max(0, Math.min(winnerTarget, winners.length - range.start));
     let list = [
         ...winners,
         ...r._marbles
@@ -58,7 +63,9 @@ function getLiveOrder() {
     }
     return {
         list,
-        finished
+        finished,
+        winnerProgress,
+        winnerTarget
     };
 }
 let rankLoopId = null;
@@ -69,7 +76,7 @@ function startLiveRanking() {
         if (!rankLoopId) return;
         if (now - lastRankPaint >= 200) {
             const order = getLiveOrder();
-            const signature = order.list.map((marble, i)=>`${marble.id}:${i < order.finished.length && order.finished[i] ? 1 : 0}`).join('|');
+            const signature = `${order.winnerProgress}/${order.winnerTarget}|${order.list.map((marble, i)=>`${marble.id}:${i < order.finished.length && order.finished[i] ? 1 : 0}`).join('|')}`;
             if (signature !== lastRankSignature) {
                 lastRankSignature = signature;
                 renderRankPreview(order);
@@ -238,7 +245,10 @@ function initialize() {
     document.querySelector('#chkSkill').addEventListener('change', (e)=>{
         window.options.useSkills = e.target.checked;
     });
-    document.querySelector('#in_winningRank').addEventListener('input', applyWinnerSetting);
+    document.querySelector('#in_winningRank').addEventListener('input', ()=>{
+        applyWinnerSetting();
+        renderRankPreview(getLiveOrder());
+    });
     document.querySelector('#chkWinnerType').addEventListener('change', (event)=>{
         winnerType = event.target.checked ? 'last' : 'first';
         applyWinnerSetting();
@@ -325,7 +335,10 @@ function initialize() {
 <section id="rankPreview" class="ranklist">
   <div class="ranklist-header">
     <span>실시간 순위</span>
-    <strong id="rankCount">0 PLAYERS</strong>
+    <div class="ranklist-stats">
+      <em id="winnerProgress">당첨 0 / 1</em>
+      <strong id="rankCount">0 PLAYERS</strong>
+    </div>
   </div>
   <div class="ranklist-body" id="rankList"></div>
 </section>
